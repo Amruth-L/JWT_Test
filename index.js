@@ -39,13 +39,24 @@ app.post("/signin", function (req, res) {
         })
     }
 })
-
-app.get("/me", function (req, res) {
+function auth(req, res, next) {
     const token = req.headers.token;
     const decodedData = jwt.verify(token, JWT_SECRET);
     if (decodedData.username) {
+        next()
+
+    } else {
+        res.json({
+            message: "you are not logged in"
+        })
+    }
+
+
+}
+app.get("/me", auth, function (req, res) {
+    if (decodedData.username) {
         for (let i = 0; i < users.length; i++) {
-            if (users[i].username == decodedData.username) {
+            if (users[i].username == req.username) {
                 foundUser = users[i]
             }
         }
@@ -54,5 +65,9 @@ app.get("/me", function (req, res) {
             password: foundUser.password
         })
     }
+
+})
+app.get("/todo", auth, function (req, res) {
+
 })
 app.listen(3000);
