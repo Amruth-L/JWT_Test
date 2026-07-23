@@ -3,7 +3,11 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = "harkirat"
 const app = express();
 app.use(express.json());
-const users = []
+const users = [];
+app.get("/", function (req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+})
+
 app.post("/signup", function (req, res) {
     const username = req.body.username
     const password = req.body.password
@@ -43,6 +47,7 @@ function auth(req, res, next) {
     const token = req.headers.token;
     const decodedData = jwt.verify(token, JWT_SECRET);
     if (decodedData.username) {
+        req.username = decodedData.username
         next()
 
     } else {
@@ -54,19 +59,20 @@ function auth(req, res, next) {
 
 }
 app.get("/me", auth, function (req, res) {
-    if (decodedData.username) {
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].username == req.username) {
-                foundUser = users[i]
-            }
+    const currentUser = req.username;
+    let foundUser = null;
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].username == currentUser) {
+            foundUser = users[i]
         }
-        res.json({
-            username: foundUser.username,
-            password: foundUser.password
-        })
     }
+    res.json({
+        username: foundUser.username,
+        password: foundUser.password
+    })
+}
 
-})
+)
 app.get("/todo", auth, function (req, res) {
 
 })
