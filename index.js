@@ -45,18 +45,15 @@ app.post("/signin", function (req, res) {
 })
 function auth(req, res, next) {
     const token = req.headers.token;
-    const decodedData = jwt.verify(token, JWT_SECRET);
-    if (decodedData.username) {
+    try {
+        const decodedData = jwt.verify(token, JWT_SECRET);
         req.username = decodedData.username
-        next()
-
-    } else {
-        res.json({
-            message: "you are not logged in"
-        })
+        next();
+    } catch (err) {
+        return res.status(401).json({
+            message: "Invalid token"
+        });
     }
-
-
 }
 app.get("/me", auth, function (req, res) {
     const currentUser = req.username;
